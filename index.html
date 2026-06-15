@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Embed Large Videos on Discord</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <span class="logo">▶ Guide</span>
+      <span class="subtitle">Embedding Large Videos on Discord</span>
+    </div>
+  </nav>
+
+  <main>
+    <section id="intro">
+      <h1>How to Embed Large Videos on Discord</h1>
+      <p class="lead">Discord's default file upload limit is <strong>25 MB</strong> (or 500 MB with Nitro). This guide covers practical ways to share larger videos without needing a subscription.</p>
+    </section>
+
+    <section id="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#limitations">Understanding Discord's Attachment Limits</a></li>
+        <li><a href="#hosting">Using File Hosting Services</a></li>
+        <li><a href="#compression">Compressing Videos with FFmpeg</a></li>
+        <li><a href="#embedding">Embedding via Link Previews</a></li>
+        <li><a href="#faq">FAQ &amp; Troubleshooting</a></li>
+      </ol>
+    </section>
+
+    <section id="limitations">
+      <h2>Understanding Discord's Attachment Limits</h2>
+      <div class="card">
+        <h3>Default Limits</h3>
+        <ul>
+          <li><strong>Free tier:</strong> 25 MB per file</li>
+          <li><strong>Nitro Classic:</strong> 50 MB per file</li>
+          <li><strong>Nitro:</strong> 500 MB per file</li>
+          <li><strong>Max upload duration:</strong> No hard limit, but long videos often exceed size caps</li>
+        </ul>
+        <p>When your video exceeds these limits, Discord will reject the upload. You have two options: compress the video or host it elsewhere and embed a link.</p>
+      </div>
+    </section>
+
+    <section id="hosting">
+      <h2>Using File Hosting Services</h2>
+      <p>Free file hosts allow you to upload files up to several GB and get a direct download link. Discord will generate a video embed from many of these links.</p>
+
+      <h3>Recommended Services</h3>
+
+      <div class="service-grid">
+        <div class="service-card">
+          <h4>Catbox.moe</h4>
+          <p><strong>Max size:</strong> 200 MB (no account) / 8 GB (with account)</p>
+          <p><strong>Retention:</strong> Forever as long as file is accessed periodically</p>
+          <p>Drag-and-drop interface. Direct links work perfectly for Discord embeds.</p>
+          <code>https://files.catbox.moe/yourfile.mp4</code>
+        </div>
+
+        <div class="service-card">
+          <h4>Imgur</h4>
+          <p><strong>Max size:</strong> 60 seconds, 200 MB for video</p>
+          <p><strong>Note:</strong> Strips audio from videos longer than 60 seconds. Better for short clips.</p>
+          <code>https://i.imgur.com/yourvideo.mp4</code>
+        </div>
+
+        <div class="service-card">
+          <h4>Streamable</h4>
+          <p><strong>Max size:</strong> 250 MB (free)</p>
+          <p>Great for short-to-medium clips. Provides direct video links.</p>
+          <code>https://streamable.com/yourlink</code>
+        </div>
+
+        <div class="service-card">
+          <h4>0x0.st</h4>
+          <p><strong>Max size:</strong> 512 MB</p>
+          <p>Minimal no-frills file host. Perfect for quick sharing. Files expire after 30 days of inactivity.</p>
+          <code>https://0x0.st/yourfile.mp4</code>
+        </div>
+      </div>
+    </section>
+
+    <section id="compression">
+      <h2>Compressing Videos with FFmpeg</h2>
+      <p>If you want to keep full control over quality and file size, <strong>FFmpeg</strong> is your best tool. Install it from <a href="https://ffmpeg.org/" target="_blank">ffmpeg.org</a>.</p>
+
+      <h3>Basic Compression</h3>
+      <div class="code-block">
+        <pre><code>ffmpeg -i input.mp4 -vcodec libx264 -crf 28 -acodec aac -b:a 128k output.mp4</code></pre>
+      </div>
+      <p><strong>CRF values:</strong> 18 = visually lossless, 23 = default, 28 = good compression, 35 = very compressed</p>
+
+      <h3>Fit Under 25 MB</h3>
+      <p>Target a specific file size using two-pass encoding:</p>
+      <div class="code-block">
+        <pre><code># Calculate bitrate: target_size_MB * 8192 / duration_seconds - audio_bitrate
+# Example: 22 MB target for a 60-second video
+ffmpeg -i input.mp4 -vcodec libx264 -b:v 2.5M -acodec aac -b:a 128k output.mp4</code></pre>
+      </div>
+
+      <h3>Reduce Resolution</h3>
+      <div class="code-block">
+        <pre><code>ffmpeg -i input.mp4 -vf "scale=854:480" -vcodec libx264 -crf 28 output_480p.mp4</code></pre>
+      </div>
+
+      <h3>Remove Audio (if not needed)</h3>
+      <div class="code-block">
+        <pre><code>ffmpeg -i input.mp4 -c copy -an silent.mp4</code></pre>
+      </div>
+
+      <div class="tip">
+        <strong>💡 Tip:</strong> Always keep a copy of the original file. Compression is lossy and quality degradation is irreversible.
+      </div>
+    </section>
+
+    <section id="embedding">
+      <h2>Embedding via Link Previews</h2>
+      <p>Discord automatically generates inline video embeds for direct links to video files. Here's how to make it work:</p>
+
+      <h3>Requirements for Embedding</h3>
+      <ul>
+        <li>The link must point directly to a video file (<code>.mp4</code>, <code>.webm</code>, <code>.mov</code>, <code>.gif</code>)</li>
+        <li>The server must allow link embeds (usually enabled by default)</li>
+        <li>The video should be a reasonable resolution (max 1920×1080 recommended)</li>
+        <li>Some hosts may block Discord's embed crawler</li>
+      </ul>
+
+      <h3>Testing Your Link</h3>
+      <p>Paste the direct video URL into any Discord channel. If Discord shows a video player, it worked. If it shows a generic link preview, the host may not be compatible.</p>
+
+      <h3>Using Discord's CDN</h3>
+      <p>If you have Nitro, upload your video directly. Discord re-encodes it and serves it from their CDN, guaranteeing embed support.</p>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ &amp; Troubleshooting</h2>
+
+      <div class="faq-item">
+        <h4>Why does my video show as a file instead of embedding?</h4>
+        <p>The link isn't a direct video URL. You need the raw file URL (ends in <code>.mp4</code>), not a page URL.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Can I embed YouTube links?</h4>
+        <p>Yes, Discord shows YouTube links as rich embeds with a clickable thumbnail, but the video plays in YouTube, not inline.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Does the file need to be under 25 MB to embed?</h4>
+        <p>No. The size limit only applies to direct uploads. Embedded videos from external hosts can be much larger (though very large files may buffer slowly).</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Are there any security concerns?</h4>
+        <p>Only upload content you own the rights to. Some free hosts may have terms limiting certain content types.</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>Last updated: 2024 | Built as a free reference guide</p>
+    </footer>
+  </main>
+</body>
+</html>
